@@ -12,3 +12,17 @@ spring:
     database: postgresql
     hibernate:
       ddl-auto: update
+  mail:
+    host: localhost
+    port: 1025
+    username: vasia
+    password: sa
+
+    properties:
+      mail:
+        smtp:
+          ssl:
+            trust: "*"
+          auth: true
+          starttls:
+            enable: true

@@ -2,6 +2,7 @@ package by.bsu.registration.registration;
 
 import by.bsu.registration.AppUser.AppUser;
 import by.bsu.registration.AppUser.AppUserService;
+import by.bsu.registration.mail.MailSender;
 import by.bsu.registration.registration.token.ConfirmationToken;
 import by.bsu.registration.registration.token.ConfirmationTokenService;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ public class RegistrationService {
     private final AppUserService appUserService;
     private final EmailValidator emailValidator;
     private final ConfirmationTokenService confirmationTokenService;
+    private final MailSender mail;
 
     public String register(RegistrationRequest request) {
         boolean isEmailValid = emailValidator.test(request.getEmail());
@@ -27,7 +29,7 @@ public class RegistrationService {
             throw new IllegalStateException("Email is not valid");
         }
 
-        return appUserService.singUpUser(
+        String token = appUserService.singUpUser(
                 new AppUser(
                         request.getFirstName(),
                         request.getLastName(),
@@ -36,6 +38,13 @@ public class RegistrationService {
                         USER
                 )
         );
+
+        String link = "http://localhost:8080/registration/confirm?token="
+                + token;
+
+        mail.send(request.getEmail(),buildEmail(link));
+
+        return token;
     }
 
     @Transactional
@@ -57,5 +66,9 @@ public class RegistrationService {
         confirmationTokenService.setConfirmedAt(token);
         appUserService.enableAppUser(confirmationToken.getAppUser().getEmail());
         return "confirmed";
+    }
+
+    private String buildEmail(String link){
+        return "<p><a href=\"" + link + "\">Activate Now</a></p>";
     }
 }
