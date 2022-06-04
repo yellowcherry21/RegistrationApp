@@ -10,6 +10,11 @@ public class UserRegistrationController {
 
     private final RegistrationService registrationService;
 
+    @GetMapping
+    public String registerRedirect(){
+        return "redirect:/cool";
+    }
+
     @PostMapping
     public String register(@RequestBody RegistrationRequest request){
         return registrationService.register(request);
